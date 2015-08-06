@@ -61,14 +61,18 @@ def sdup
   @stack.push a
 end
 
-def split_array(arr, idx)
-  [arr[0,idx], arr[idx..-1]]
+def split_array(arr, size)
+  if size == 0
+    [arr, []]
+  else
+    [arr[0,arr.length - size], arr[-size..-1]]
+  end
 end
 
 def sroll1(depth)
   return if depth == 0
-  top = @stack.pop
-  head, tail = split_array(@stack, depth - 1)
+  head, tail = split_array(@stack, depth)
+  top = tail.pop
   @stack = head + [top] + tail
 end
 
@@ -109,7 +113,7 @@ filename = ARGV[0]
 @lines = []
 
 def label_lineno(word)
-  stmt = "JMP #{word}"
+  stmt = "LABEL #{word}"
   @lines.index stmt
 end
 
@@ -152,10 +156,8 @@ while true
     i = label_lineno(word) if n == 0
   when /JMP (.+)/
     word = $1
-    n = @stack.pop
     i = label_lineno(word)
   when nil then break
-  else raise "unknown command: #{cmd}"
   end
 end
 
