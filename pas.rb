@@ -1,5 +1,6 @@
 # encoding: utf-8
 require 'pp'
+require 'optparse'
 
 @stack = []
 
@@ -109,7 +110,17 @@ def soutc
   print n.chr("UTF-8")
 end
 
-filename = ARGV[0]
+OptionParser.new do |o|
+  o.on('-v', '--verbose', 'verbose option') { |b| @print_stack = b }
+  o.on('-f FILENAME') { |name| @filename = name }
+  begin
+    o.parse!
+  rescue
+    puts "#{o}"
+    exit
+  end
+end
+
 @lines = []
 
 def label_lineno(word)
@@ -121,7 +132,7 @@ def comment_line?(line)
   line =~ /[ \t]+#.*/
 end
 
-open filename do |file|
+open @filename do |file|
   while line = file.gets
     @lines << line.chomp if not comment_line? line
   end
@@ -131,6 +142,7 @@ i = -1
 while true
   i += 1
   cmd = @lines[i]
+  print "#{sprintf "%03d", i + 1} #{cmd}: " if @print_stack
 
   case cmd
   when /PUSH ([0-9]+)/ then spush $1.to_i
@@ -159,5 +171,6 @@ while true
     i = label_lineno(word)
   when nil then break
   end
+  puts "#{@stack}" if @print_stack
 end
 
