@@ -128,13 +128,9 @@ def label_lineno(word)
   @lines.index stmt
 end
 
-def comment_line?(line)
-  line =~ /[ \t]+#.*/
-end
-
 open @filename do |file|
   while line = file.gets
-    @lines << line.chomp if not comment_line? line
+    @lines << line.chomp
   end
 end
 
@@ -142,31 +138,33 @@ i = -1
 while true
   i += 1
   cmd = @lines[i]
-  print "#{sprintf "%03d", i + 1} #{cmd}: " if @print_stack
+  /[ \t]*([^#]*)(#.*)?/.match cmd
+  cmd_without_comment = $2
+  STDERR.print "#{sprintf "%03d", i + 1} #{cmd}:\t" if @print_stack
 
-  case cmd
-  when /PUSH ([0-9]+)/ then spush $1.to_i
-  when /POP/  then spop
-  when /ADD/  then sadd
-  when /SUB/  then ssub
-  when /MUL/  then smul
-  when /DIV/  then sdiv
-  when /MOD/  then smod
-  when /NOT/  then snot
-  when /GREATER/  then sgreater
-  when /DUP/  then sdup
-  when /ROLL/ then sroll
-  when /INN/  then sinn
-  when /INC/  then sinc
-  when /OUTN/ then soutn
-  when /OUTC/ then soutc
-  when /HALT/ then break
-  when /LABEL (.+)/ then next
-  when /JEZ (.+)/
+  case cmd_without_comment
+  when /^PUSH ([0-9]+)/ then spush $1.to_i
+  when /^POP/  then spop
+  when /^ADD/  then sadd
+  when /^SUB/  then ssub
+  when /^MUL/  then smul
+  when /^DIV/  then sdiv
+  when /^MOD/  then smod
+  when /^NOT/  then snot
+  when /^GREATER/  then sgreater
+  when /^DUP/  then sdup
+  when /^ROLL/ then sroll
+  when /^INN/  then sinn
+  when /^INC/  then sinc
+  when /^OUTN/ then soutn
+  when /^OUTC/ then soutc
+  when /^HALT/ then break
+  when /^LABEL (.+)/ then next
+  when /^JEZ (.+)/
     word = $1
     n = @stack.pop
     i = label_lineno(word) if n == 0
-  when /JMP (.+)/
+  when /^JMP (.+)/
     word = $1
     i = label_lineno(word)
   when nil then break
