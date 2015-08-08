@@ -138,11 +138,11 @@ i = -1
 while true
   i += 1
   cmd = @lines[i]
-  /([^#]*)(#.*)?/.match cmd
-  cmd_without_comment = $1
+  /[ \t]*([^#]*)(#.*)?/.match cmd
+  cmd_without_comment = $2
   STDERR.print "#{sprintf "%03d", i + 1} #{cmd}:\t" if @print_stack
 
-  case cmd
+  case cmd_without_comment
   when /^PUSH ([0-9]+)/ then spush $1.to_i
   when /^POP/  then spop
   when /^ADD/  then sadd
