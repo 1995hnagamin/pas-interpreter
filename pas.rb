@@ -1,11 +1,18 @@
 # encoding: utf-8
 require 'pp'
 require 'optparse'
+require 'io/console'
 
 @stack = []
 
 def print_stack
-  print "[", @stack.join(","), "]\n"
+  STDERR.print "[", @stack.join(","), "]\n"
+end
+
+def stack_state(stack)
+  stack.map do |s|
+    [s,s.chr("UTF-8")]
+  end
 end
 
 def spush(n)
@@ -111,7 +118,8 @@ def soutc
 end
 
 OptionParser.new do |o|
-  o.on('-v', '--verbose', 'verbose option') { |b| @print_stack = b }
+  o.on('-v', '--verbose', 'verbose option')  { |b| @print_stack = b }
+  o.on('-s', '--step', 'stepwise execution') { |b| @stepwise = b }
   o.on('-f FILENAME') { |name| @filename = name }
   begin
     o.parse!
@@ -142,7 +150,7 @@ i = -1
 while true
   i += 1
   cmd = @lines[i]
-  print "#{sprintf "%03d", i + 1} #{cmd}: " if @print_stack
+  STDERR.print "#{sprintf "%03d", i + 1} #{cmd}:\t" if @print_stack
 
   case cmd
   when /PUSH ([0-9]+)/ then spush $1.to_i
@@ -161,7 +169,7 @@ while true
   when /OUTN/ then soutn
   when /OUTC/ then soutc
   when /HALT/ then break
-  when /LABEL (.+)/ then next
+  when /LABEL (.+)/ then ;
   when /JEZ (.+)/
     word = $1
     n = @stack.pop
@@ -171,6 +179,8 @@ while true
     i = label_lineno(word)
   when nil then break
   end
-  puts "#{@stack}" if @print_stack
+  print_stack if @print_stack
+  stepping_input = STDIN.getch if @stepwise
+  exit if stepping_input == ?\C-c
 end
 
