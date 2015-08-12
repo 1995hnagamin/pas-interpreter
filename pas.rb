@@ -139,7 +139,7 @@ while true
   i += 1
   cmd = @lines[i]
   /[ \t]*([^#]*)(#.*)?/.match cmd
-  cmd_without_comment = $2
+  cmd_without_comment = $1
   STDERR.print "#{sprintf "%03d", i + 1} #{cmd}:\t" if @print_stack
 
   case cmd_without_comment
