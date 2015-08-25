@@ -16,6 +16,14 @@ def spop
   @stack.pop
 end
   
+
+def sswap
+  a = @stack.pop
+  b = @stack.pop
+  @stack.push a
+  @stack.push b
+end
+
 def sadd
   a = @stack.pop
   b = @stack.pop
@@ -145,6 +153,7 @@ while true
   case cmd_without_comment
   when /^PUSH ([0-9]+)/ then spush $1.to_i
   when /^POP/  then spop
+  when /^SWAP/ then sswap
   when /^ADD/  then sadd
   when /^SUB/  then ssub
   when /^MUL/  then smul
@@ -167,7 +176,9 @@ while true
   when /^JMP (.+)/
     word = $1
     i = label_lineno(word)
-  when nil then break
+  when nil then break 
+  else
+    throw "unknown command: #{cmd_without_comment}"
   end
   puts "#{@stack}" if @print_stack
 end
