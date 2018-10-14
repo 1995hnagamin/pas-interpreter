@@ -88,6 +88,9 @@ end
 def sroll
   roll = @stack.pop
   depth = @stack.pop
+  if roll < 0 then
+    roll = roll % depth + depth
+  end
   roll.times do
     sroll1 depth
   end
