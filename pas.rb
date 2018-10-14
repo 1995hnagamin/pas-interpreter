@@ -15,7 +15,7 @@ end
 def spop
   @stack.pop
 end
-  
+
 
 def sswap
   a = @stack.pop
@@ -179,7 +179,7 @@ while true
   when /^JMP (.+)/
     word = $1
     i = label_lineno(word)
-  when nil then break 
+  when nil then break
   else
     throw "unknown command: #{cmd_without_comment}"
   end
