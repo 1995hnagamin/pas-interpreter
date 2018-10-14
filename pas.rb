@@ -151,7 +151,7 @@ while true
   STDERR.print "#{sprintf "%03d", i + 1} #{cmd}:\t" if @print_stack
 
   case cmd_without_comment
-  when /^PUSH ([0-9]+)/ then spush $1.to_i
+  when /^PUSH (-?[0-9]+)/ then spush $1.to_i
   when /^POP/  then spop
   when /^SWAP/ then sswap
   when /^ADD/  then sadd
